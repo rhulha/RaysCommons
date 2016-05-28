@@ -2,12 +2,8 @@ package net.raysforge.commons;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public class Json {
 
@@ -71,6 +67,14 @@ public class Json {
         return sb.toString();
     }
 
+    private boolean readExact(Reader r, String str) throws IOException {
+    	for (int i = 0; i < str.length(); i++) {
+			if((char)r.read() != str.charAt(i))
+				return false;
+		}
+        return true;
+    }
+
     Object arrayEndIndicator = new Object();
     Object commaIndicator = new Object();
 
@@ -89,20 +93,17 @@ public class Json {
             else if (c == '"')
                 return readUntil(r, '"');
             else if (c == 't') {
-            	String s = readUntil(r, 'e'); // true
-            	if("ru".equals(s))
+            	if(readExact(r, "rue")) // true
             		return true;
             	else throw new RuntimeException("unsupported char at: " + c + StreamUtils.readCompleteReader(r));
             }
             else if (c == 'n') {
-            	String s = readUntil(r, 'l'); // null
-            	if("ul".equals(s))
-            		return null;
+            	if(readExact(r, "ull")) // null
+            		return true;
             	else throw new RuntimeException("unsupported char at: " + c + StreamUtils.readCompleteReader(r));
             }
             else if (c == 'f') {
-            	String s = readUntil(r, 'e'); // false
-            	if("als".equals(s))
+            	if(readExact(r, "alse")) // false
             		return false;
             	else throw new RuntimeException("unsupported char at: " + c + StreamUtils.readCompleteReader(r));
             }
