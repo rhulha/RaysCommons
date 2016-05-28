@@ -2,9 +2,11 @@ package net.raysforge.commons;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.*;
 import java.util.Map.Entry;
 
+// Warming: This class is not heavily tested. I just like to write parsers in my spare time... 
 public class Json {
 
 	private Map<String, Object> parseObject(Reader r) throws IOException {
@@ -56,13 +58,26 @@ public class Json {
     }
 
     private String readUntil(Reader r, char ch) throws IOException {
+    	return readUntil(r, ch, false);
+    }
+    private String readUntil(Reader r, char ch, boolean checkForQuote) throws IOException {
         StringBuffer sb = new StringBuffer();
         int i;
+        boolean lastCharWasQuote=false;
         while ((i = r.read()) >= 0) {
             char c = (char) i;
-            if (c == ch)
-                break;
-            sb.append(c);
+            if(checkForQuote) {
+                if (!lastCharWasQuote && c == ch)
+                    break;
+            	
+            } else {
+                if (c == ch)
+                    break;
+            }
+            lastCharWasQuote = c == '\\';
+            
+            if(!checkForQuote || !lastCharWasQuote)
+            	sb.append(c);
         }
         return sb.toString();
     }
@@ -91,7 +106,7 @@ public class Json {
             else if (c == ',')
                 return commaIndicator;
             else if (c == '"')
-                return readUntil(r, '"');
+                return readUntil(r, '"', true);
             else if (c == 't') {
             	if(readExact(r, "rue")) // true
             		return true;
@@ -146,4 +161,12 @@ public class Json {
     	sb.append("}");
     	return sb.toString();
     }
+    
+    public static void main(String[] args) throws IOException {
+    	String s = "Hello \\\"World\\\" shoudBeIncluded\"shouldBeIgnored";
+		StringReader r = new StringReader(s);
+		System.out.println( new Json().readUntil(r, '"', false));
+		r = new StringReader(s);
+		System.out.println( new Json().readUntil(r, '"', true));
+	}
 }
