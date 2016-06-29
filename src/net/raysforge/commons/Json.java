@@ -155,6 +155,9 @@ public class Json {
 			else if( entry.getValue() instanceof Double) {
 				sb.append(entry.getValue());
 			}
+			else if( entry.getValue() instanceof Long) {
+				sb.append(entry.getValue());
+			}
 			else throw new RuntimeException("unsupported type: " + entry.getValue().getClass());
 		}
     	

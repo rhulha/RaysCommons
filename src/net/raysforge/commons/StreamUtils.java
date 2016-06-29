@@ -14,6 +14,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.util.zip.GZIPOutputStream;
 
 public class StreamUtils {
@@ -78,7 +79,10 @@ public class StreamUtils {
 		return line;
 	}
 
-	public static String readOneLineOfInputStream(InputStream is) throws IOException {
+	public static String readOneLineISO88591(InputStream is) throws IOException {
+		return readOneLineOfInputStream(is, Charset.forName("ISO-8859-1"));
+	}
+	public static String readOneLineOfInputStream(InputStream is, Charset cs) throws IOException {
 		// local variable is threadsafe (2048 is not too big for local field)
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
 		int ch = 0;
@@ -94,7 +98,26 @@ public class StreamUtils {
 		// return null, in case we got called at the end of the stream already.
 		if (count == 0)
 			return null;
-		return baos.toString();
+		return baos.toString(cs.name());
+	}
+
+	public static byte[] readOneLineOfInputStream(InputStream is) throws IOException {
+		// local variable is threadsafe (2048 is not too big for local field)
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
+		int ch = 0;
+		int count = 0;
+		while ((ch = is.read()) != -1) {
+			count++;
+			if (ch == '\r')
+				continue;
+			if (ch == '\n')
+				break;
+			baos.write(ch);
+		}
+		// return null, in case we got called at the end of the stream already.
+		if (count == 0)
+			return null;
+		return baos.toByteArray();
 	}
 
 	public static String readCompleteInputStream(InputStream is, String charset) throws IOException {
