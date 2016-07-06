@@ -82,6 +82,7 @@ public class StreamUtils {
 	public static String readOneLineISO88591(InputStream is) throws IOException {
 		return readOneLineOfInputStream(is, Charset.forName("ISO-8859-1"));
 	}
+
 	public static String readOneLineOfInputStream(InputStream is, Charset cs) throws IOException {
 		// local variable is threadsafe (2048 is not too big for local field)
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
@@ -124,11 +125,12 @@ public class StreamUtils {
 		BufferedReader r = new BufferedReader(new InputStreamReader(is, charset));
 		StringBuffer sb = new StringBuffer();
 		char buffer[] = new char[0xffff];
-		int nchars;
-
-		while ((nchars = r.read(buffer)) != -1)
-			sb.append(buffer, 0, nchars);
-		is.close();
+		try {
+			for (int nchars; (nchars = r.read(buffer)) != -1;)
+				sb.append(buffer, 0, nchars);
+		} finally {
+			r.close();
+		}
 		return sb.toString();
 	}
 
@@ -191,7 +193,7 @@ public class StreamUtils {
 					read_this_time = r.read(cbuf, 0, BUF_CAP);
 					if (read_this_time > 0)
 						stringbuf.append(cbuf, 0, read_this_time);
-				}//end while
+				} //end while
 			}
 		} finally {
 			close(r);
