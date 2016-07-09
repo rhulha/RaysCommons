@@ -111,6 +111,22 @@ public class IntUtils {
 			return -result;
 		}
 	}
+	
+    public static String formatNumber(long number) {
+        String formatted;
+        if (number > 1000000000) {
+            formatted = Long.toString(number / 1000000000) + " GB";
+        } else if (number > 1000000) {
+            formatted = Long.toString(number / 1000000) + " MB";
+        } else if (number > 1000) {
+            formatted = Long.toString(number / 1000) + " KB";
+        } else {
+            formatted = Long.toString(number) + " bytes";
+        }
+        return (formatted);
+
+    }
+
 
 	public static void main(String[] args) {
 		System.out.println(parseInt("123hello"));
