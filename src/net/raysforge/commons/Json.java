@@ -74,10 +74,35 @@ public class Json {
                 if (c == ch)
                     break;
             }
-            lastCharWasQuote = c == '\\';
-            
-            if(!checkForQuote || !lastCharWasQuote)
+            if(checkForQuote) {
+            	if( lastCharWasQuote ) {
+                	switch(c) {
+						case '"':
+							sb.append('"');
+                			break;
+						case 'r':
+							sb.append('\r');
+                			break;
+						case 'n':
+							sb.append('\n');
+                			break;
+						case 't':
+							sb.append('\t');
+                			break;
+						case 'b':
+                			break;
+						case 'f':
+                			break;
+                	}
+            	} else if(c=='\\'){
+            		// do nothing
+            	} else {
+                	sb.append(c);
+            	}
+            } else {
             	sb.append(c);
+            }
+            lastCharWasQuote = c == '\\';
         }
         return sb.toString();
     }
@@ -131,8 +156,7 @@ public class Json {
         return null;
     }
     
-    @SuppressWarnings("unchecked")
-	public static String toJsonString(Map<String, Object> map) {
+    public static String toJsonString(Map<String, Object> map) {
     	StringBuffer sb = new StringBuffer();
     	sb.append("{");
     	
@@ -146,24 +170,43 @@ public class Json {
     			sb.append(",");
     		}
 			sb.append("\""+entry.getKey()+"\":");
-			if( entry.getValue() instanceof String) {
-				sb.append("\""+entry.getValue()+"\"");
-			}
-			else if( entry.getValue() instanceof Map<?,?>) {
-				sb.append(toJsonString((Map<String, Object>) entry.getValue()));
-			}
-			else if( entry.getValue() instanceof Double) {
-				sb.append(entry.getValue());
-			}
-			else if( entry.getValue() instanceof Long) {
-				sb.append(entry.getValue());
-			}
-			else throw new RuntimeException("unsupported type: " + entry.getValue().getClass());
+			appendValue(sb, entry.getValue());
 		}
     	
     	sb.append("}");
     	return sb.toString();
     }
+
+    public static String toJsonString(List<Object> array) {
+    	StringBuffer sb = new StringBuffer();
+    	appendValue(sb, array);
+    	return sb.toString();
+    }
+
+	@SuppressWarnings("unchecked")
+	private static void appendValue(StringBuffer sb, Object value) {
+		if( value instanceof String) {
+			sb.append("\""+value+"\""); // TODO QUOTE
+		}
+		else if( value instanceof Map<?,?>) {
+			sb.append(toJsonString((Map<String, Object>) value));
+		}
+		else if( value instanceof List<?>) {
+			List<?> l = (List<?>) value;
+			sb.append("[");
+			String delimiter="";
+			for (Object o : l) {
+				sb.append(delimiter);
+				appendValue(sb, o);
+				delimiter=",";
+			}
+			sb.append("]");
+		}
+		else if( value instanceof Double || value instanceof Long || value instanceof Boolean || value instanceof Integer) {
+			sb.append(value);
+		}
+		else throw new RuntimeException("unsupported type: " + value.getClass());
+	}
     
     public static void main(String[] args) throws IOException {
     	String s = "Hello \\\"World\\\" shoudBeIncluded\"shouldBeIgnored";
