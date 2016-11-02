@@ -219,6 +219,8 @@ public class Json {
 				String nr = part.substring(part.indexOf('[') + 1, part.indexOf(']'));
 				part = part.substring(0, part.indexOf('['));
 				List<Object> list = (List<Object>) ((Map<String, Object>) jsonObject).get(part);
+				if(list == null)
+					return null;
 				jsonObject = list.get(Integer.parseInt(nr));
 			} else {
 				jsonObject = ((Map<String, Object>) jsonObject).get(part);
