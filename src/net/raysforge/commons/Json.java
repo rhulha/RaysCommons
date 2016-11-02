@@ -206,8 +206,38 @@ public class Json {
 		} else
 			throw new RuntimeException("unsupported type: " + value.getClass());
 	}
+	
+	// example path: "$.store.book[0].author"
+	@SuppressWarnings("unchecked")
+	public static Object getJsonPath(Object jsonObject, String path) {
+
+		if (!path.startsWith("$."))
+			throw new RuntimeException("Error: JsonPath path must start with '$.'");
+		String parts[] = path.substring(2).split("\\.");
+		for (String part : parts) {
+			if (part.endsWith("]")) {
+				String nr = part.substring(part.indexOf('[') + 1, part.indexOf(']'));
+				part = part.substring(0, part.indexOf('['));
+				List<Object> list = (List<Object>) ((Map<String, Object>) jsonObject).get(part);
+				jsonObject = list.get(Integer.parseInt(nr));
+			} else {
+				jsonObject = ((Map<String, Object>) jsonObject).get(part);
+			}
+		}
+		return jsonObject;
+	}
 
 	public static void main(String[] args) throws IOException {
+		String json = "{ \"store\": {\r\n" + "    \"book\": [ \r\n" + "      { \"category\": \"reference\",\r\n" + "        \"author\": \"Nigel Rees\",\r\n" + "        \"title\": \"Sayings of the Century\",\r\n" + "        \"price\": 8.95\r\n" + "      },\r\n"
+				+ "      { \"category\": \"fiction\",\r\n" + "        \"author\": \"Evelyn Waugh\",\r\n" + "        \"title\": \"Sword of Honour\",\r\n" + "        \"price\": 12.99\r\n" + "      },\r\n" + "      { \"category\": \"fiction\",\r\n"
+				+ "        \"author\": \"Herman Melville\",\r\n" + "        \"title\": \"Moby Dick\",\r\n" + "        \"isbn\": \"0-553-21311-3\",\r\n" + "        \"price\": 8.99\r\n" + "      },\r\n" + "      { \"category\": \"fiction\",\r\n"
+				+ "        \"author\": \"J. R. R. Tolkien\",\r\n" + "        \"title\": \"The Lord of the Rings\",\r\n" + "        \"isbn\": \"0-395-19395-8\",\r\n" + "        \"price\": 22.99\r\n" + "      }\r\n" + "    ],\r\n" + "    \"bicycle\": {\r\n"
+				+ "      \"color\": \"red\",\r\n" + "      \"price\": 19.95\r\n" + "    }\r\n" + "  }\r\n" + "}";
+
+		Object parsed = new Json().parse(new StringReader(json));
+		Object result = getJsonPath(parsed, "$.store.book[1].author");
+		System.out.println("result: " + result);
+
 		String s = "Hello \\\"World\\\" shoudBeIncluded\"shouldBeIgnored";
 		StringReader r = new StringReader(s);
 		System.out.println(new Json().readUntil(r, '"', false));
