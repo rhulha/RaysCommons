@@ -23,7 +23,7 @@ public class IntUtils {
     }
     
 	/*
-	Einschränkungen:
+	Einschrï¿½nkungen:
 	sei prim_m*prim_n = prim_produkt
 
 	so sind:
@@ -129,6 +129,10 @@ public class IntUtils {
 
 
 	public static void main(String[] args) {
+		System.out.println(parseInt(null));
+		System.out.println(parseInt(""));
+		System.out.println(parseInt("hello"));
+		System.out.println(parseInt("12hello434"));
 		System.out.println(parseInt("123hello"));
 	}
 }
