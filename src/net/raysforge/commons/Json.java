@@ -188,7 +188,8 @@ public class Json {
 	@SuppressWarnings("unchecked")
 	private static void appendValue(StringBuffer sb, Object value) {
 		if (value instanceof String) {
-			sb.append("\"" + value + "\""); // TODO QUOTE
+			String str = (String) value;
+			sb.append("\"" + str.replace("\r\n", "\\n").replace("\n", "\\n").replace("\r", "\\n").replace("\"", "\\\"") + "\""); // TODO QUOTE
 		} else if (value instanceof Map<?, ?>) {
 			sb.append(toJsonString((Map<String, Object>) value));
 		} else if (value instanceof List<?>) {

@@ -1,5 +1,7 @@
 package net.raysforge.commons;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.text.Collator;
 
@@ -32,5 +34,11 @@ public class Service {
 		}
 
 		return Collator.getInstance().equals(s, t);
+	}
+
+	public static String getStackTrace(Throwable e) {
+		StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
 	}
 }
