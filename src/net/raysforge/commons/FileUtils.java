@@ -107,6 +107,14 @@ public class FileUtils {
 		}
 	}
 
+	public static void writeFile(File f, StringBuffer buf, String codePage) throws IOException {
+		writeFile(f, new ByteArrayInputStream(buf.toString().getBytes(codePage)), true, 16384);
+	}
+
+	public static void writeFile(File f, String string, String codePage) throws IOException {
+		writeFile(f, new ByteArrayInputStream(string.getBytes(codePage)), true, 16384);
+	}
+
 	public static void writeFile(String filename, String text, String codePage) throws IOException {
 		writeFile(filename, new ByteArrayInputStream(text.getBytes(codePage)), true, 16384);
 	}
@@ -119,13 +127,18 @@ public class FileUtils {
 		writeFile(filename, is, true, 16384);
 	}
 	public static void writeFile(File file, InputStream is, Streamer streamer) throws IOException {
-		writeFile(file, is, streamer);
+		writeFile(file, is, true, streamer);
 	}
 
 	public static void writeFile(String filename, InputStream is, boolean writeBuffered, int bufferSize) throws IOException {
 		Streamer s = new Streamer();
 		s.bufferSize=bufferSize;
 		writeFile(new File(filename), is, writeBuffered, s);
+	}
+	public static void writeFile(File file, InputStream is, boolean writeBuffered, int bufferSize) throws IOException {
+		Streamer s = new Streamer();
+		s.bufferSize=bufferSize;
+		writeFile(file, is, writeBuffered, s);
 	}
 	public static void writeFile(File file, InputStream is, boolean writeBuffered, Streamer streamer) throws IOException {
 		OutputStream os = new FileOutputStream(file);
