@@ -6,7 +6,7 @@ public class AudioLineOut {
 
 	SourceDataLine line;
 	AudioFormat audioFormat;
-	
+
 	public AudioLineOut() {
 		this(AudioUtils.CD_AUDIO_FORMAT, 16_000);
 	}

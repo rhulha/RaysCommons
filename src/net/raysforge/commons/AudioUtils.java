@@ -1,6 +1,7 @@
 package net.raysforge.commons;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -18,16 +19,17 @@ public class AudioUtils {
 	public static final AudioFormat CD_AUDIO_FORMAT = new AudioFormat(44100.0F, 16, 2, true, false);
 
 	public static ByteBuffer readAudioFile(File file) throws UnsupportedAudioFileException, IOException {
-		AudioInputStream ais = AudioSystem.getAudioInputStream(file);
+		return readAudioFile(AudioSystem.getAudioInputStream(file));
+	}
+
+	public static ByteBuffer readAudioFile(AudioInputStream ais) throws UnsupportedAudioFileException, IOException {
 		if (!ais.getFormat().matches(CD_AUDIO_FORMAT)) {
 			ais = AudioSystem.getAudioInputStream(CD_AUDIO_FORMAT, ais);
 		}
-		byte[] completeSong = new byte[ais.available()];
-		ais.read(completeSong);
-		if (ais.read(completeSong) != -1) {
-			throw new IOException("bytes missed: " + file.getName());
-		}
-		return ByteBuffer.wrap(completeSong).order(ByteOrder.LITTLE_ENDIAN);
+		
+		ByteArrayOutputStream baos = StreamUtils.readCompleteInputStream(ais);
+		
+		return ByteBuffer.wrap(baos.toByteArray()).order(ByteOrder.LITTLE_ENDIAN);
 	}
 
 	public static void mix(ByteBuffer song, ByteBuffer sound, int offset, float volume) {
