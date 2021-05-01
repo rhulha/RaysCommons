@@ -10,6 +10,7 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.util.Base64;
 
 public class WebDavClient extends Authenticator {
 	
@@ -114,7 +115,7 @@ public class WebDavClient extends Authenticator {
 		if( !isAuthenticated)
 		{
 			String userpass = username + ":" + password;
-			String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+			String basicAuth = "Basic " + Base64.getEncoder().encodeToString(userpass.getBytes());
 			c.setRequestProperty ("Authorization", basicAuth);			
 		}
 	}

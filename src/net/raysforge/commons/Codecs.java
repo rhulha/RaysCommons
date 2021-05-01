@@ -6,17 +6,16 @@ package net.raysforge.commons;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 public class Codecs
 {
 	public static String toBase64(byte[] val) {
-		return DatatypeConverter.printBase64Binary(val);
+		return Base64.getEncoder().encodeToString(val);
 	}
 	
 	public static byte[] fromBase64(String s) {
-		return DatatypeConverter.parseBase64Binary(s);
+		return Base64.getDecoder().decode(s);
 	}
 	
     private static final char[] UCDIGITS =

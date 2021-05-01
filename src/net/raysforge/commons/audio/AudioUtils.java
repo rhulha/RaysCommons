@@ -1,4 +1,4 @@
-package net.raysforge.commons;
+package net.raysforge.commons.audio;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,6 +10,8 @@ import java.nio.ShortBuffer;
 
 import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFormat.Encoding;
+
+import net.raysforge.commons.StreamUtils;
 
 //AudioFormat(float sampleRate, int sampleSizeInBits, int channels, boolean signed, boolean bigEndian) 
 //AudioFormat audioFormat = new AudioFormat(44100.0F, 16, 2, true, false);

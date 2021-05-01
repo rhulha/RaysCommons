@@ -1,4 +1,4 @@
-package net.raysforge.commons;
+package net.raysforge.commons.audio;
 
 import javax.sound.sampled.*;
 
