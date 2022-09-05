@@ -9,7 +9,12 @@ import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Base64;
 
 public class WebDavClient extends Authenticator {
@@ -30,7 +35,7 @@ public class WebDavClient extends Authenticator {
 		isAuthenticated = true;
 		return new PasswordAuthentication(username, password.toCharArray());
 	}
-
+	
 	public boolean exists(String urlPath) throws IOException {
 		System.out.println("checking: " + urlPath);
 
@@ -42,6 +47,33 @@ public class WebDavClient extends Authenticator {
 		return responseCode != 404;
 
 	}
+	
+    public void createFolder(String urlPath) throws Exception {
+        System.out.println("createFolder: " + urlPath);
+        
+        HttpClient httpClient = HttpClient.newBuilder()
+                .authenticator(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password.toCharArray());
+                    }
+                })
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseURL + urlPath))
+                .method("MKCOL", HttpRequest.BodyPublishers.ofString(""))
+                //.header("Content-Type", "text/xml")
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        
+        if( response.statusCode() != 201 )
+            System.out.println(response.body());
+
+    }
 
 	public boolean delete(String urlPath) throws IOException {
 		System.out.println("deleting: " + urlPath);
